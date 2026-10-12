@@ -1,0 +1,368 @@
+@import "tailwindcss";
+
+/* ── LIT brand tokens (from the logo and Sunday flyers) ─────────────────── */
+:root {
+  --background: #faf8f4;
+  --surface: #ffffff;
+  --foreground: #1f1d1b;
+  --muted: #6b645d;
+  --border: #e7e1d8;
+  --flame: #e8601a;
+  --flame-red: #c8231b;
+  --flame-gold: #f2b01e;
+  --lit-green: #17803a;
+  --lit-green-dark: #0f5f2a;
+  --charcoal: #1c1a19;
+  /* Street voice (signboards & flyers) */
+  --scarlet: #7a1512;
+  --snow: #faf8f4;
+  --ribbon: #c8231b;
+  --flyer-yellow: #f6c21a;
+  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+  color-scheme: light;
+}
+
+/* Light is the default on every device; dark only when the visitor chooses it (ThemeToggle). */
+:root[data-theme="dark"] {
+  --background: #141312;
+  --surface: #1e1c1a;
+  --foreground: #f3efe9;
+  --muted: #aaa298;
+  --border: #34302c;
+  --charcoal: #0d0c0b;
+  color-scheme: dark;
+}
+
+/* Smooth colour change when toggling (class added briefly by ThemeToggle) */
+.theme-transition,
+.theme-transition * {
+  transition:
+    background-color 0.4s var(--ease-out),
+    border-color 0.4s var(--ease-out),
+    color 0.4s var(--ease-out) !important;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-flame: var(--flame);
+  --color-flame-red: var(--flame-red);
+  --color-flame-gold: var(--flame-gold);
+  --color-lit-green: var(--lit-green);
+  --color-lit-green-dark: var(--lit-green-dark);
+  --color-charcoal: var(--charcoal);
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-fraunces);
+  --font-street: var(--font-oswald);
+  --color-scarlet: var(--scarlet);
+  --color-snow: var(--snow);
+  --color-ribbon: var(--ribbon);
+  --color-flyer-yellow: var(--flyer-yellow);
+}
+
+/* ── Typography ─────────────────────────────────────────────────────────
+   Serif display (Fraunces) for headings, Inter for reading text.
+   17px body · 1.65 leading · ~65ch measure · balanced headings.          */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  font-feature-settings: "kern", "liga", "calt", "ss01";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4 {
+  text-wrap: balance;
+}
+p, li, blockquote {
+  text-wrap: pretty;
+}
+blockquote {
+  hanging-punctuation: first;
+}
+::selection {
+  background: color-mix(in oklab, var(--flame) 25%, transparent);
+}
+
+@utility text-display {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 1.6rem + 5.6vw, 6.25rem);
+  line-height: 0.98;
+  letter-spacing: -0.03em;
+  word-spacing: 0.08em;
+  font-weight: 450;
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+}
+@utility text-h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2.25rem, 1.5rem + 2.8vw, 3.75rem);
+  line-height: 1.06;
+  letter-spacing: -0.02em;
+  word-spacing: 0.07em;
+  font-weight: 450;
+  font-variation-settings: "opsz" 120;
+}
+@utility text-h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 1.35rem + 1.6vw, 2.625rem);
+  line-height: 1.12;
+  letter-spacing: -0.016em;
+  word-spacing: 0.05em;
+  font-weight: 450;
+  font-variation-settings: "opsz" 96;
+}
+@utility text-h3 {
+  font-family: var(--font-display);
+  font-size: clamp(1.375rem, 1.2rem + 0.6vw, 1.75rem);
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+  font-weight: 500;
+  font-variation-settings: "opsz" 48;
+}
+@utility text-h4 {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  font-weight: 550;
+  font-variation-settings: "opsz" 24;
+}
+/* Street voice: condensed capitals, like the flyers and signboards */
+@utility text-street {
+  font-family: var(--font-street);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.005em;
+  line-height: 0.92;
+}
+@utility text-street-xl {
+  @apply text-street;
+  font-size: clamp(3.5rem, 1.8rem + 8vw, 9rem);
+}
+@utility text-street-lg {
+  @apply text-street;
+  font-size: clamp(2.5rem, 1.6rem + 4vw, 5rem);
+}
+@utility text-street-md {
+  @apply text-street;
+  font-size: clamp(1.75rem, 1.3rem + 2vw, 2.75rem);
+  line-height: 0.98;
+}
+@utility text-street-label {
+  font-family: var(--font-street);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.8125rem;
+  line-height: 1;
+}
+
+@utility text-lead {
+  font-size: clamp(1.125rem, 1rem + 0.45vw, 1.3125rem);
+  line-height: 1.6;
+  color: var(--muted);
+}
+@utility measure {
+  max-width: 65ch;
+}
+@utility eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  line-height: 1;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--flame);
+  &::before {
+    content: "";
+    width: 1.75rem;
+    height: 1px;
+    background: currentColor;
+    opacity: 0.6;
+  }
+}
+
+/* ── Components ─────────────────────────────────────────────────────── */
+@utility btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-[0.9375rem] font-semibold tracking-[-0.005em] transition-[background-color,color,border-color,transform,box-shadow] duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-flame active:scale-[0.98];
+}
+@utility btn-primary {
+  @apply btn bg-flame text-white shadow-[0_8px_24px_-10px_var(--flame)] hover:-translate-y-0.5 hover:bg-flame-red;
+}
+@utility btn-green {
+  @apply btn bg-lit-green text-white hover:-translate-y-0.5 hover:bg-lit-green-dark;
+}
+@utility btn-outline {
+  @apply btn border border-border bg-surface text-foreground hover:-translate-y-0.5 hover:border-flame;
+}
+@utility card {
+  @apply rounded-3xl border border-border bg-surface p-6 sm:p-8;
+}
+@utility lift {
+  @apply transition-[transform,box-shadow,border-color] duration-500 ease-[var(--ease-out)] hover:-translate-y-1 hover:border-flame/40 hover:shadow-[0_24px_48px_-24px_rgba(28,26,25,0.25)];
+}
+@utility field {
+  @apply w-full rounded-xl border border-border bg-surface px-4 py-3 text-base text-foreground transition-colors placeholder:text-muted focus:border-flame focus:ring-4 focus:ring-flame/10 focus:outline-none;
+}
+
+/* ── Know Jesus: "scarlet to snow" (Isaiah 1:18) ───────────────────────
+   --wash (0→1) is set by <ScarletToSnow> as the reader passes the cross. */
+.scarlet-to-snow {
+  --wash: 0;
+  --ink: #ffffff;
+  --ink-muted: rgba(255, 255, 255, 0.74);
+  background-color: color-mix(in oklab, var(--scarlet) calc((1 - var(--wash)) * 100%), var(--snow));
+  color: var(--ink);
+  transition: color 0.6s var(--ease-out);
+}
+.scarlet-to-snow[data-tone="light"] {
+  --ink: #1f1d1b;
+  --ink-muted: #5f5852;
+}
+
+/* Forces light-mode tokens inside a section (e.g. the snow-white prayer section) */
+.light-scope {
+  --background: #faf8f4;
+  --surface: #ffffff;
+  --foreground: #1f1d1b;
+  --muted: #6b645d;
+  --border: #e7e1d8;
+  color: var(--foreground);
+}
+
+/* ── Motion ─────────────────────────────────────────────────────────────
+   Pure CSS, no JavaScript: nothing can be left hidden and nothing conflicts
+   with hydration. Browsers without scroll-driven animations simply show
+   content immediately. All motion stops for prefers-reduced-motion.      */
+
+/* Entrance on page load, for above-the-fold content (stagger with --d) */
+@keyframes enter {
+  from { opacity: 0; transform: translate3d(0, 24px, 0); }
+}
+.enter {
+  animation: enter 0.9s var(--ease-out) both;
+  animation-delay: calc(var(--d, 0) * 110ms);
+}
+
+/* Gentle fade on every navigation (app/template.tsx) */
+@keyframes page-enter {
+  from { opacity: 0; transform: translate3d(0, 8px, 0); }
+}
+.page-enter {
+  /* "backwards" so no transform lingers after the fade (it would break position: fixed) */
+  animation: page-enter 0.45s var(--ease-out) backwards;
+}
+
+/* Scroll reveal: scrubbed by scroll position, no observers */
+@supports (animation-timeline: view()) {
+  @keyframes reveal-up {
+    from { opacity: 0; transform: translate3d(0, 32px, 0); }
+  }
+  @keyframes reveal-zoom {
+    from { opacity: 0; transform: scale(0.94); }
+  }
+  @keyframes swing-in {
+    from { opacity: 0; transform: rotate(calc(var(--tilt, 0deg) - 7deg)) translate3d(0, 40px, 0); }
+    to   { opacity: 1; transform: rotate(var(--tilt, 0deg)); }
+  }
+  [data-reveal] {
+    animation: reveal-up linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 70%;
+  }
+  [data-reveal="zoom"] {
+    animation-name: reveal-zoom;
+  }
+  .swing-in {
+    transform-origin: 50% 0%;
+    animation: swing-in linear both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 35%;
+  }
+}
+
+@keyframes ken-burns {
+  from { transform: scale(1.14) translate3d(0, -1.5%, 0); }
+  to   { transform: scale(1) translate3d(0, 0, 0); }
+}
+.ken-burns {
+  animation: ken-burns 18s var(--ease-out) both;
+}
+
+@keyframes flicker {
+  0%, 100% { transform: scale(1, 1) skewX(0deg); }
+  25%      { transform: scale(0.97, 1.04) skewX(-1.5deg); }
+  50%      { transform: scale(1.02, 0.98) skewX(1deg); }
+  75%      { transform: scale(0.99, 1.03) skewX(-0.5deg); }
+}
+.flicker {
+  transform-origin: 50% 90%;
+  animation: flicker 3.2s ease-in-out infinite;
+}
+
+/* A flame catching: used when someone responds to the gospel */
+@keyframes ignite {
+  0%   { transform: scale(0.15); opacity: 0; filter: blur(6px); }
+  55%  { transform: scale(1.18); opacity: 1; filter: blur(0); }
+  100% { transform: scale(1); opacity: 1; }
+}
+.ignite {
+  transform-origin: 50% 85%;
+  animation: ignite 1.1s var(--ease-out) both;
+}
+
+@keyframes glow {
+  0%, 100% { opacity: 0.55; transform: scale(1); }
+  50%      { opacity: 0.85; transform: scale(1.08); }
+}
+.glow {
+  animation: glow 7s ease-in-out infinite;
+}
+
+@keyframes scroll-cue {
+  0%   { transform: translateY(0); opacity: 0; }
+  30%  { opacity: 1; }
+  100% { transform: translateY(14px); opacity: 0; }
+}
+.scroll-cue {
+  animation: scroll-cue 2s ease-in-out infinite;
+}
+
+/* Header gains a shadow and a solid background as the page scrolls */
+@supports (animation-timeline: scroll()) {
+  @keyframes header-solid {
+    to {
+      background-color: color-mix(in oklab, var(--background) 96%, transparent);
+      box-shadow: 0 10px 30px -18px rgba(0, 0, 0, 0.35);
+      border-color: var(--border);
+    }
+  }
+  .site-header {
+    animation: header-solid linear both;
+    animation-timeline: scroll();
+    animation-range: 0 140px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  [data-reveal], .swing-in, .enter, .page-enter, .ignite,
+  .ken-burns, .flicker, .glow, .scroll-cue {
+    animation: none !important;
+  }
+  .swing-in { transform: rotate(var(--tilt, 0deg)); }
+}
