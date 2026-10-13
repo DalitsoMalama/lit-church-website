@@ -1,0 +1,6 @@
+# Keep line endings consistent (LF) for everyone; shell scripts must be LF to run.
+* text=auto eol=lf
+*.sh text eol=lf
+*.png binary
+*.jpg binary
+*.ico binary

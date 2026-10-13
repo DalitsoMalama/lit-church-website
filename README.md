@@ -15,8 +15,8 @@ npm run dev                  # http://localhost:3000
 3. Form submissions land in `people` + `journey_events` (visits, salvation responses) and `prayer_requests`. Every new person automatically gets a `followups` row due within 24 hours.
 4. Staff access: sign in, then set your `profiles.role` (e.g. `admin`, `elder`, `followup`) in the table editor. Row-level security controls who can read what.
 
-## Deploy to Vercel
-Import the repo in Vercel, add the variables from `.env.example`, and deploy. Set `NEXT_PUBLIC_SITE_URL` to the live domain.
+## Deploy (Supabase + Vercel)
+Step-by-step guide: **[DEPLOY.md](DEPLOY.md)**. Security notes and pre-launch checklist: **[SECURITY.md](SECURITY.md)**.
 
 ## Where to edit content (for now)
 | What | File |

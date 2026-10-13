@@ -1,11 +1,18 @@
 // Central church details. Update here and the whole site follows.
 
+// Public address of the site. Set NEXT_PUBLIC_SITE_URL once the domain is live; until then
+// Vercel's production address is used automatically (Vercel exposes it to the build).
+const vercelUrl = process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL;
+const siteUrl = (
+  process.env.NEXT_PUBLIC_SITE_URL || (vercelUrl ? `https://${vercelUrl}` : "http://localhost:3000")
+).replace(/\/$/, "");
+
 const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? ""; // e.g. 260971234567 (no +)
 
 export const site = {
   name: "Living Temples Church",
   shortName: "LIT Church",
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
+  url: siteUrl,
   mission: "Beautifying Every Life and Destiny by the Manifestation of the Truth.",
   themeVerse: {
     ref: "1 Corinthians 6:19",
