@@ -87,3 +87,30 @@ set role anon; select set_config('request.jwt.claim.sub','', false) \g /dev/null
 \echo 'T27 expect 0: anon reads devotional dated today but approved (publish_date=current_date → visible=1 is OK)'
 select count(*) from devotionals;
 reset role;
+
+\echo '--- ADMIN CONTENT (20261013 migration) ---'
+set role anon; select set_config('request.jwt.claim.sub','', false) \g /dev/null
+\echo 'T28 expect UPDATE 0 (no rows visible to change): anon edits church details'
+update site_settings set data = '{"mission":"hacked"}';
+\echo 'T29 expect RLS ERROR: anon adds a sermon'
+insert into sermons (title, speaker, preached_on) values ('Spam', 'Spammer', current_date);
+\echo 'T30 expect RLS ERROR: anon edits a devotional day'
+insert into devotional_days (day, title, scripture_ref, reflection, approved) values (1, 'x', 'John 1:1', 'xxxxxxxxxxxxxxxxxxxxxxxxx', true);
+\echo 'T31 expect 1 / 1: anon can read settings + published sermon'
+select (select count(*) from site_settings) settings, (select count(*) from sermons) sermons;
+reset role;
+update sermons set published = false;
+set role anon;
+\echo 'T32 expect 0: anon cannot see an unpublished sermon'
+select count(*) from sermons;
+reset role;
+update sermons set published = true;
+
+set role authenticated; select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-00000000000d', false) \g /dev/null
+\echo 'T33 expect RLS ERROR: media approves a devotional day'
+insert into devotional_days (day, title, scripture_ref, reflection, approved) values (2, 'Edit', 'John 1:1', 'A reflection that is long enough.', true);
+\echo 'T34 expect OK: media saves a draft devotional day'
+insert into devotional_days (day, title, scripture_ref, reflection, approved) values (3, 'Edit', 'John 1:1', 'A reflection that is long enough.', false);
+\echo 'T35 expect UPDATE 0: media edits church details (elders/admin only)'
+update site_settings set data = '{}';
+reset role;

@@ -1,9 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Fraunces, Inter, Oswald } from "next/font/google";
 import "./globals.css";
-import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
 import { ServiceWorker } from "@/components/InstallApp";
+import { getSite } from "@/lib/content";
 import { site } from "@/lib/site";
 
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"] });
@@ -15,18 +14,21 @@ const fraunces = Fraunces({
   style: ["normal", "italic"],
 });
 
-export const metadata: Metadata = {
-  metadataBase: new URL(site.url),
-  title: {
-    default: `${site.name} (LIT) | Church in Kitwe, Zambia`,
-    template: `%s | ${site.shortName}`,
-  },
-  description: `${site.mission} Join us every ${site.service.day} at ${site.service.time}, ${site.service.venue}, ${site.service.address}.`,
-  openGraph: { siteName: site.name, locale: "en_ZM", type: "website" },
-  applicationName: site.shortName,
-  // iPhone "Add to Home Screen": open full-screen like an app
-  appleWebApp: { capable: true, title: site.shortName, statusBarStyle: "default" },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const live = await getSite();
+  return {
+    metadataBase: new URL(site.url),
+    title: {
+      default: `${site.name} (LIT) | Church in Kitwe, Zambia`,
+      template: `%s | ${site.shortName}`,
+    },
+    description: `${live.mission} Join us every ${live.service.day} at ${live.service.time}, ${live.service.venue}, ${live.city}.`,
+    openGraph: { siteName: site.name, locale: "en_ZM", type: "website" },
+    applicationName: site.shortName,
+    // iPhone "Add to Home Screen": open full-screen like an app
+    appleWebApp: { capable: true, title: site.shortName, statusBarStyle: "default" },
+  };
+}
 
 export const viewport: Viewport = {
   themeColor: "#e8601a",
@@ -51,9 +53,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         />
       </head>
       <body className="flex min-h-full flex-col font-sans">
-        <Header />
-        <main className="flex-1">{children}</main>
-        <Footer />
+        {children}
         <ServiceWorker />
       </body>
     </html>

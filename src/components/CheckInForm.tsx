@@ -5,8 +5,9 @@ import { useSearchParams } from "next/navigation";
 import { Suspense, useActionState, useState, useSyncExternalStore } from "react";
 import { submitCheckIn, type FormState } from "@/app/actions";
 import { formatServiceDateLong } from "@/lib/service";
-import { site } from "@/lib/site";
 import { Field } from "./forms";
+import { useSite } from "./SiteProvider";
+import { keepValues } from "./useSubmit";
 import { WhatsApp } from "./icons";
 import { Flame } from "./street";
 
@@ -75,6 +76,7 @@ export function CheckInForm() {
 }
 
 function CheckInRound({ kiosk, onNext }: { kiosk: boolean; onNext: () => void }) {
+  const site = useSite();
   const raw = useSyncExternalStore(subscribe, read, () => null);
   const member = kiosk ? null : parseMember(raw);
   const [state, action, pending] = useActionState(async (prev: FormState, fd: FormData) => {
@@ -118,6 +120,7 @@ function CheckInRound({ kiosk, onNext }: { kiosk: boolean; onNext: () => void })
   return (
     <form
       action={action}
+      onSubmit={keepValues(action)}
       className="space-y-6 [&:has(input[name=firstTime][value=yes]:checked)_.first-only]:block"
       noValidate
     >

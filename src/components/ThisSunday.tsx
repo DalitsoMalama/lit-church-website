@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { useSyncExternalStore } from "react";
 import { formatServiceDate, formatServiceDateLong, nextService, serviceLabel } from "@/lib/service";
-import { site, whatsappShare } from "@/lib/site";
+import { whatsappShare } from "@/lib/site";
 import { WhatsApp } from "./icons";
+import { useSite } from "./SiteProvider";
 import { Ribbon } from "./street";
 
 // A ticking clock shared by every subscriber; null on the server (renders the static fallback).
@@ -27,9 +28,10 @@ function parts(ms: number) {
 
 /** The "This Sunday" signboard: next service date, live countdown, calendar + WhatsApp invite. */
 export function ThisSunday() {
+  const site = useSite();
   const nowSec = useSyncExternalStore(subscribe, getNow, getServerNow);
   const now = nowSec === null ? null : new Date(nowSec * 1000);
-  const service = now ? nextService(now) : null;
+  const service = now ? nextService(now, site.service) : null;
 
   const invite = service
     ? `Join me at ${site.name} on ${formatServiceDateLong(service.start)} at ${site.service.time}, ${site.service.venue}, ${site.service.address}. Come as you are! ${site.url}/visit`
@@ -40,7 +42,7 @@ export function ThisSunday() {
       className="relative w-full max-w-md rounded-[6px] border-[6px] border-white/90 bg-lit-green p-6 text-white shadow-[0_40px_80px_-30px_rgba(0,0,0,0.7)] sm:p-8 lg:rotate-[-2deg]"
       aria-live="polite"
     >
-      <Ribbon>{service && now ? serviceLabel(service, now) : `This ${site.service.day}`}</Ribbon>
+      <Ribbon>{service && now ? serviceLabel(service, now, site.service.weekday) : `This ${site.service.day}`}</Ribbon>
 
       <p className="text-street mt-6 text-5xl whitespace-nowrap text-flyer-yellow sm:text-6xl">
         {service ? formatServiceDate(service.start) : `Every ${site.service.day}`}

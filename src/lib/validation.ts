@@ -98,3 +98,84 @@ export function formFields(formData: FormData) {
   }
   return data;
 }
+
+/* ── Admin: church details ─────────────────────────────────────────── */
+
+const line = (max: number) => text(max);
+const httpsUrl = z
+  .string()
+  .trim()
+  .max(300)
+  .refine((u) => u === "" || /^https:\/\/[^\s<>"]+$/.test(u), "Must be a full https:// link");
+
+export const settingsSchema = z.object({
+  mission: line(200).pipe(z.string().min(5, "Mission is required")),
+  city: line(80).pipe(z.string().min(2)),
+  leadPastor: line(80).pipe(z.string().min(2, "Lead pastor is required")),
+  service: z.object({
+    weekday: z.coerce.number().int().min(0).max(6),
+    startHour: z.coerce.number().int().min(0).max(23),
+    startMinute: z.coerce.number().int().min(0).max(59),
+    durationMinutes: z.coerce.number().int().min(15).max(600),
+    venue: line(100).pipe(z.string().min(2, "Venue is required")),
+    address: line(200).pipe(z.string().min(5, "Address is required")),
+  }),
+  whatsapp: z.object({
+    // International format without "+", e.g. 260971234567; empty = not set yet
+    number: z
+      .string()
+      .trim()
+      .transform((n) => n.replace(/\D/g, ""))
+      .refine((n) => n === "" || /^\d{9,15}$/.test(n), "Enter the number like 260971234567"),
+    communityUrl: httpsUrl.refine((u) => u === "" || u.startsWith("https://chat.whatsapp.com/"), "Must be a chat.whatsapp.com invite link"),
+  }),
+  cellGroups: z
+    .array(
+      z.object({
+        area: line(60).pipe(z.string().min(2, "Area is required")),
+        leader: line(80),
+        meetingTime: line(80),
+      }),
+    )
+    .max(40),
+});
+
+/* ── Admin: sermons ────────────────────────────────────────────────── */
+
+export const sermonSchema = z.object({
+  title: line(150).pipe(z.string().min(2, "Title is required")),
+  series: line(100).optional(),
+  speaker: line(100).pipe(z.string().min(2, "Speaker is required")),
+  preachedOn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Pick a date"),
+  scripture: line(100).optional(),
+  summary: line(1000).optional(),
+  videoUrl: httpsUrl.optional(),
+  audioUrl: httpsUrl.optional(),
+  published: z.literal("on").optional(),
+});
+
+/* ── Admin: devotional day ─────────────────────────────────────────── */
+
+export const devotionalSchema = z.object({
+  title: line(120).pipe(z.string().min(2, "Title is required")),
+  scripture: line(60).pipe(z.string().min(3, "Scripture reference is required")),
+  verseText: line(1000).optional(),
+  reflection: line(4000).pipe(z.string().min(20, "Reflection must be at least 20 characters")),
+  prayer: line(1000).optional(),
+  declaration: line(500).optional(),
+  action: line(500).optional(),
+  approved: z.literal("on").optional(),
+});
+
+/* ── Admin: follow-up & prayer ─────────────────────────────────────── */
+
+export const followupSchema = z.object({
+  stage: z.enum(["new", "contacted", "visited", "attending", "foundations", "baptized", "cell_group", "closed"]),
+  notes: line(2000).optional(),
+  contactedNow: z.literal("on").optional(),
+});
+
+export const prayerUpdateSchema = z.object({
+  status: z.enum(["open", "praying", "answered", "archived"]),
+  testimony: line(1500).optional(),
+});

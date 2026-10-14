@@ -4,6 +4,8 @@ import { Suspense, useActionState, type ReactNode } from "react";
 import { useSearchParams } from "next/navigation";
 import type { FormState } from "@/app/actions";
 import { whatsappLink } from "@/lib/site";
+import { useSite } from "./SiteProvider";
+import { keepValues } from "./useSubmit";
 
 type Action = (prev: FormState, formData: FormData) => Promise<FormState>;
 
@@ -20,6 +22,7 @@ export function IntakeForm({
   whatsappMessage: string;
   children: (errors: FormState["errors"]) => ReactNode;
 }) {
+  const site = useSite();
   const [state, formAction, pending] = useActionState(action, initial);
 
   if (state.ok) {
@@ -27,7 +30,7 @@ export function IntakeForm({
       <div role="status" className="card space-y-4 border-lit-green">
         <p className="text-h4 text-lit-green">🔥 Received!</p>
         <p>{state.message}</p>
-        <a href={whatsappLink(whatsappMessage)} className="btn-green">
+        <a href={whatsappLink(site, whatsappMessage)} className="btn-green">
           Message us on WhatsApp
         </a>
       </div>
@@ -35,7 +38,7 @@ export function IntakeForm({
   }
 
   return (
-    <form action={formAction} className="space-y-4" noValidate>
+    <form action={formAction} onSubmit={keepValues(formAction)} className="space-y-4" noValidate>
       {/* Honeypot: hidden from people, bots fill it in */}
       <input type="text" name="website" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" />
       <Suspense>
@@ -46,7 +49,7 @@ export function IntakeForm({
         <p role="alert" className="rounded-xl bg-flame/10 p-3 text-sm text-flame-red">
           {state.message}{" "}
           {!state.errors && (
-            <a href={whatsappLink(whatsappMessage)} className="font-semibold underline">
+            <a href={whatsappLink(site, whatsappMessage)} className="font-semibold underline">
               Open WhatsApp
             </a>
           )}

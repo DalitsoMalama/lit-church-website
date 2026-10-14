@@ -5,7 +5,7 @@ import { MobileMenu } from "./MobileMenu";
 import { InstallButton } from "./InstallApp";
 import { ThemeToggle } from "./ThemeToggle";
 import { WhatsApp } from "./icons";
-import { site, whatsappLink } from "@/lib/site";
+import { whatsappLink, type SiteInfo } from "@/lib/site";
 
 type NavItem = { href: string; label: string; note?: string };
 
@@ -27,7 +27,7 @@ export const nav: NavItem[] = [...primaryNav, ...growNav, { href: "/about", labe
 const linkCls =
   "relative py-1 text-foreground/80 transition-colors after:absolute after:inset-x-0 after:-bottom-0.5 after:h-px after:origin-left after:scale-x-0 after:bg-flame after:transition-transform after:duration-300 hover:text-foreground hover:after:scale-x-100";
 
-export function Header() {
+export function Header({ site }: { site: SiteInfo }) {
   return (
     <header className="site-header sticky print:hidden top-0 z-40 border-b border-transparent bg-background/70 backdrop-blur-xl">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-3.5">
@@ -106,7 +106,7 @@ export function Header() {
                 <p className="text-sm text-white/70">
                   {site.service.venue}, {site.service.address}
                 </p>
-                <a href={whatsappLink("Hello LIT Church!")} className="btn-green w-full">
+                <a href={whatsappLink(site, "Hello LIT Church!")} className="btn-green w-full">
                   <WhatsApp /> Chat on WhatsApp
                 </a>
               </div>

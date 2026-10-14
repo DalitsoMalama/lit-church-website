@@ -304,12 +304,12 @@ export const devotionals: Devotional[] = [
 /** The series launch date (Africa/Lusaka). Day 1 falls on this date, then it cycles every 28 days. */
 export const SERIES_START = process.env.DEVOTIONAL_START_DATE ?? "2026-10-12";
 
-export function devotionalForDate(isoDate: string): Devotional {
+export function devotionalForDate(isoDate: string, list: Devotional[] = devotionals): Devotional {
   const start = Date.parse(`${SERIES_START}T00:00:00Z`);
   const today = Date.parse(`${isoDate}T00:00:00Z`);
   const diff = Math.max(0, Math.floor((today - start) / 86_400_000)); // before launch → Day 1
-  const index = ((diff % devotionals.length) + devotionals.length) % devotionals.length;
-  return devotionals[index];
+  const index = ((diff % list.length) + list.length) % list.length;
+  return list[index];
 }
 
 export function getDevotional(day: number) {

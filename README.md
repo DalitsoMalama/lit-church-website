@@ -5,9 +5,25 @@ Next.js 16 (App Router, Tailwind v4) on **Vercel** + **Supabase**. The product p
 ## Run locally
 ```bash
 npm install
-cp .env.example .env.local   # fill in values (site works without Supabase; forms show a fallback)
-npm run dev                  # http://localhost:3000
+npm run db:start   # local database in Docker (Supabase-compatible); writes keys + an admin password to .env.local
+npm run dev        # http://localhost:3000
 ```
+Without Docker the site still runs on built-in content (`cp .env.example .env.local`); forms then show a "not connected" message.
+`npm run db:stop` stops the database; `npm run db:reset` wipes local data and re-runs all migrations.
+
+## Admin side: http://localhost:3000/admin
+Sign in with the **`ADMIN_PASSWORD`** from `.env.local` (on Vercel: from the project's environment variables).
+
+| Section | What you can do |
+|---|---|
+| **Church details** | Service day, time and length, venue and address (map updates automatically), mission, lead pastor, WhatsApp number and community link, cell groups (leader, meeting time) |
+| **Sermons** | Add, edit, hide or delete sermons; paste a YouTube or Facebook link and it plays on the site |
+| **Devotionals** | Edit any of the 28 days, tick **Approved**, or restore the original text |
+| **People & follow-up** | Everyone from Plan a Visit, Know Jesus and first-time check-ins: their journey, a one-tap WhatsApp message, follow-up stage and notes. Overdue (>24h) are flagged |
+| **Prayer requests** | Read requests (private ones marked), set Praying / Answered / Archived, record testimonies |
+| **Attendance** | Today's headcount, first-time guests, service history, QR poster and usher kiosk links |
+
+Changes appear on the public website immediately (cached content is refreshed on save).
 
 ## Connect Supabase
 1. Create a project at supabase.com and copy its URL and publishable key into `.env.local`.
@@ -18,16 +34,14 @@ npm run dev                  # http://localhost:3000
 ## Deploy (Supabase + Vercel)
 Step-by-step guide: **[DEPLOY.md](DEPLOY.md)**. Security notes and pre-launch checklist: **[SECURITY.md](SECURITY.md)**.
 
-## Where to edit content (for now)
+## Content that still lives in code
 | What | File |
 |---|---|
-| Service time, venue, cell groups, WhatsApp | `src/lib/site.ts` (+ env vars) |
-| Daily devotionals (28-day series) | `src/content/devotionals.ts`. Set `approved: true` once reviewed. |
+| Built-in defaults for church details | `src/lib/site.ts` (`defaultSettings`) |
+| Original devotional text (admin edits override it) | `src/content/devotionals.ts` |
 | Gospel steps / salvation prayer / Bemba text | `src/content/gospel.ts` |
-| Sermons (paste YouTube links) | `src/content/sermons.ts` |
-| Beliefs (draft) | `src/app/about/page.tsx` |
-
-Content moves into Supabase with an admin editor in a later phase (the `devotionals` table already exists).
+| Current sermon series banner | `src/content/sermons.ts` (`currentSeries`) |
+| Beliefs (draft) | `src/app/(site)/about/page.tsx` |
 
 ## Evangelism QR codes
 Give each evangelist a code, e.g. `ABC123`, and print a QR for `https://<domain>/r/ABC123`. It opens the Know Jesus page, and any response is tagged with that code (`people.referral_code`).

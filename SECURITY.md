@@ -27,14 +27,22 @@
 | F3 | `/devotional/99`, `/devotional/abc` returned **200** instead of **404** | Day validated before streaming starts |
 | F4 | Search engines could index staff and check-in pages | `robots.txt` disallows `/attendance`, `/checkin`, `/r/`, `/calendar` |
 
+## Admin side (added 13 Oct 2026)
+- **Sign-in:** a shared `ADMIN_PASSWORD` (12+ characters) issues a signed 12-hour session cookie (`HttpOnly`, `Secure`, `SameSite=Strict`, path `/admin`). The session becomes invalid the moment the password changes. 5 attempts per 15 minutes.
+- **Two layers of protection:** `src/proxy.ts` redirects anyone without a valid session before an admin page renders, and **every admin page and server action calls `requireAdmin()` again**.
+- **Writes** use the server-only service key *after* that check. Input is validated with zod (https-only links, WhatsApp invite links only from `chat.whatsapp.com`, length limits, prototype-pollution-safe form parsing).
+- **Database rules** for the new tables (`site_settings`, `sermons`, `devotional_days`): public read only (unpublished sermons hidden); only staff roles may write; only elders/admin may approve devotionals. Covered by RLS tests T28–T35.
+- **Fixed while building it:** forms were cleared by React 19 after a failed submission (lost input on public and admin forms); unauthenticated `/admin` returned 200 before redirecting client-side (now a 307 from the proxy).
+
 ## Known, accepted risks (with recommendations)
 1. **The public Supabase key allows direct inserts** into the intake tables, bypassing the website's rate limits. The database rules still block reading, editing and anything invalid. *If spam ever appears:* add Cloudflare Turnstile to the forms, or move public writes behind a server-only key.
 2. **Rate limits are kept in memory per server instance.** *Before launch:* add a Vercel Firewall rate-limit rule, e.g. 30 POST requests per minute per IP on `/visit`, `/know-jesus`, `/prayer`, `/checkin` and `/attendance`.
-3. **The attendance report uses a shared PIN** until staff sign-in (Supabase Auth with roles) is built. Use a long PIN, share it only with ushers and elders, and change it if someone leaves.
+3. **The admin side and attendance report use shared passwords** until individual staff accounts (Supabase Auth with roles) are built. There is no per-person audit trail yet. Use long passphrases, share them only with the people who need them, and **change them when someone leaves a role**.
 4. **Check-ins are linked to people by phone number.** Someone who knows another person's number could check them in. Low impact.
 5. **The CSP allows inline scripts**, because Next.js's static pages need them (nonces would make every page render per request). All other CSP protections apply.
 
 ## Deployment checklist
+- [ ] `ADMIN_PASSWORD`: at least 12 characters (a passphrase); `ADMIN_SECRET`: random 32+ characters.
 - [ ] `ATTENDANCE_PIN`: at least 8 characters, ideally a passphrase.
 - [ ] `ATTENDANCE_SECRET`: a random 32+ character value (`openssl rand -hex 32`).
 - [ ] `SUPABASE_SERVICE_ROLE_KEY`: server-only; **never** prefix it with `NEXT_PUBLIC_`.

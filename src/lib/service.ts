@@ -1,4 +1,4 @@
-import { site } from "./site";
+import { DAY_NAMES, defaultSettings, type ChurchSettings } from "./site";
 
 // Zambia (Africa/Lusaka) is UTC+2 all year, with no daylight saving.
 const LUSAKA_OFFSET_MS = 2 * 60 * 60 * 1000;
@@ -6,10 +6,11 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 const TZ = "Africa/Lusaka";
 
 export type ServiceTime = { start: Date; end: Date; live: boolean };
+export type Schedule = Pick<ChurchSettings["service"], "weekday" | "startHour" | "startMinute" | "durationMinutes">;
 
 /** The current service if it is under way, otherwise the next one. Safe on server and client. */
-export function nextService(now: Date = new Date()): ServiceTime {
-  const { weekday, startHour, startMinute, durationMinutes } = site.service;
+export function nextService(now: Date = new Date(), schedule: Schedule = defaultSettings.service): ServiceTime {
+  const { weekday, startHour, startMinute, durationMinutes } = schedule;
   const local = new Date(now.getTime() + LUSAKA_OFFSET_MS); // UTC fields now read as Lusaka time
   const daysAhead = (7 + weekday - local.getUTCDay()) % 7;
   let start =
@@ -40,11 +41,12 @@ export const formatServiceDateLong = (d: Date) =>
 export const lusakaDate = (d: Date = new Date()) => new Intl.DateTimeFormat("en-CA", { timeZone: TZ }).format(d);
 
 /** "Happening now" / "Today" / "Tomorrow" / "This Sunday" / "Next Sunday" label. */
-export function serviceLabel(s: ServiceTime, now: Date = new Date()) {
+export function serviceLabel(s: ServiceTime, now: Date = new Date(), weekday = defaultSettings.service.weekday) {
+  const dayName = DAY_NAMES[weekday] ?? "Sunday";
   if (s.live) return "Happening now";
   const days = Math.round((Date.parse(lusakaDate(s.start)) - Date.parse(lusakaDate(now))) / DAY_MS);
   if (days === 0) return "Today";
   if (days === 1) return "Tomorrow";
-  if (days >= 7) return `Next ${site.service.day}`; // e.g. Sunday afternoon, after the service
-  return `This ${site.service.day}`;
+  if (days >= 7) return `Next ${dayName}`; // e.g. Sunday afternoon, after the service
+  return `This ${dayName}`;
 }

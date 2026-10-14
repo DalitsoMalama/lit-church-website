@@ -3,7 +3,7 @@
 import { z } from "zod";
 import { rateLimit } from "@/lib/rate-limit";
 import { lusakaDate } from "@/lib/service";
-import { site } from "@/lib/site";
+import { getSite } from "@/lib/content";
 import { publicClient, supabaseConfigured } from "@/lib/supabase/server";
 import { checkInSchema, formFields as fields, prayerSchema, responseSchema, visitSchema } from "@/lib/validation";
 
@@ -133,8 +133,9 @@ export async function submitCheckIn(_prev: FormState, formData: FormData): Promi
   if (!parsed.success) return { ok: false, message: "Please check the form.", errors: z.flattenError(parsed.error).fieldErrors };
   const c = parsed.data;
 
-  // Sundays are always the Sunday Service; on other days a QR code can name the event (?service=Youth Night)
+  // On the regular service day it is always that service (e.g. "Sunday Service"); on other days a QR code can name the event (?service=Youth Night)
   const now = new Date();
+  const site = await getSite();
   const isServiceDay = new Date(now.getTime() + 2 * 3600_000).getUTCDay() === site.service.weekday;
   const service = isServiceDay ? `${site.service.day} Service` : c.service || "Special Service";
 

@@ -1,8 +1,9 @@
 import type { MetadataRoute } from "next";
-import { site } from "@/lib/site";
+import { getSite } from "@/lib/content";
 
 // Makes the site installable as an app on phones (home-screen icon, opens without browser bars).
-export default function manifest(): MetadataRoute.Manifest {
+export default async function manifest(): Promise<MetadataRoute.Manifest> {
+  const site = await getSite();
   return {
     id: "/",
     name: `${site.shortName}: ${site.name}`,

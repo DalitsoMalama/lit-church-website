@@ -3,18 +3,20 @@
 import { useEffect, useRef } from "react";
 import { submitPrayer, submitResponse, submitVisit } from "@/app/actions";
 import { Consent, ContactFields, Field, IntakeForm } from "./forms";
+import { useSite } from "./SiteProvider";
 
 export function VisitForm() {
+  const { service } = useSite();
   return (
     <IntakeForm
       action={submitVisit}
       submitLabel="Plan my visit"
-      whatsappMessage="Hello LIT Church, I have planned to visit this Sunday."
+      whatsappMessage={`Hello LIT Church, I have planned to visit this ${service.day}.`}
     >
       {(errors) => (
         <>
           <ContactFields errors={errors} />
-          <Field label="Which Sunday? (optional)" name="visitDate" errors={errors}>
+          <Field label={`Which ${service.day}? (optional)`} name="visitDate" errors={errors}>
             <input name="visitDate" type="date" className="field" />
           </Field>
           <div className="grid grid-cols-2 gap-4">

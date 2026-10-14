@@ -9,7 +9,7 @@ accounts at [supabase.com](https://supabase.com) and [vercel.com](https://vercel
 ## 1. Database (Supabase)
 
 1. **Create a project:** name it `lit-church`, set a strong database password (save it in a password manager), and pick the region **closest to Zambia** that's offered.
-2. **Create the tables and security rules:** open **SQL Editor → New query**, paste the whole of `supabase/migrations/20261011000000_init.sql` and click **Run**. Then do the same for `supabase/migrations/20261012000000_attendance.sql`. Both should report *Success*.
+2. **Create the tables and security rules:** open **SQL Editor → New query**, paste the whole of each file in `supabase/migrations/` **in order** and click **Run** each time: `20261011000000_init.sql`, then `20261012000000_attendance.sql`, then `20261013000000_admin_content.sql`. Each should report *Success*.
 3. **Turn off public sign-ups for now** (there are no staff logins yet): **Authentication → Sign In / Providers → Email**, switch off **Allow new users to sign up**.
 4. **Copy three values** from **Project Settings → API Keys** (or **Data API**) for step 2:
    - **Project URL**, e.g. `https://abcd1234.supabase.co`
@@ -26,6 +26,8 @@ accounts at [supabase.com](https://supabase.com) and [vercel.com](https://vercel
 | `NEXT_PUBLIC_SUPABASE_URL` | Project URL from step 1.4 | |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Publishable (anon) key | Public by design |
 | `SUPABASE_SERVICE_ROLE_KEY` | Secret (service_role) key | **Mark as Sensitive.** Never prefix with `NEXT_PUBLIC_` |
+| `ADMIN_PASSWORD` | A passphrase, **12+ characters** | Unlocks **/admin**. Share only with the Reverend, elders & media lead |
+| `ADMIN_SECRET` | Random 64-character value | Generate like `ATTENDANCE_SECRET` below |
 | `ATTENDANCE_PIN` | A passphrase, **8+ characters** | Share only with ushers & elders |
 | `ATTENDANCE_SECRET` | Random 64-character value | Generate: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"` |
 | `NEXT_PUBLIC_WHATSAPP_NUMBER` | e.g. `260971234567` | Church WhatsApp, no `+` or spaces |

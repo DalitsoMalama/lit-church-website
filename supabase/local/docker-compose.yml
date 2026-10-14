@@ -1,0 +1,48 @@
+# Local stand-in for Supabase, for development only.
+#   npm run db:start   → starts it (data is kept in a Docker volume)
+#   npm run db:stop    → stops it
+#   npm run db:reset   → deletes all local data and re-runs the migrations
+# API: http://localhost:54321 (same /rest/v1 paths as Supabase). Database: localhost:54322.
+name: lit-church-local
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_PASSWORD: postgres # local only
+    ports:
+      - "54322:5432"
+    volumes:
+      - lit-db:/var/lib/postgresql/data
+      - ../tests/00_supabase_stub.sql:/docker-entrypoint-initdb.d/00-supabase-stub.sql:ro
+      - ./init-roles.sql:/docker-entrypoint-initdb.d/01-roles.sql:ro
+      - ./apply-migrations.sh:/docker-entrypoint-initdb.d/02-migrations.sh:ro
+      - ../migrations:/migrations:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U postgres"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  rest:
+    image: postgrest/postgrest
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PGRST_DB_URI: postgres://authenticator:authenticator@db:5432/postgres
+      PGRST_DB_SCHEMAS: public
+      PGRST_DB_ANON_ROLE: anon
+      PGRST_JWT_SECRET: local-development-only-jwt-secret-not-for-production
+      PGRST_DB_CHANNEL_ENABLED: "true" # reload schema on NOTIFY pgrst
+
+  gateway:
+    image: nginx:alpine
+    depends_on: [rest]
+    ports:
+      - "54321:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+
+volumes:
+  lit-db:

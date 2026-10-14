@@ -2,9 +2,9 @@ import Link from "next/link";
 import { Logo } from "./Logo";
 import { nav } from "./Header";
 import { WhatsApp } from "./icons";
-import { site, whatsappLink } from "@/lib/site";
+import { whatsappLink, type SiteInfo } from "@/lib/site";
 
-export function Footer() {
+export function Footer({ site }: { site: SiteInfo }) {
   return (
     <footer className="mt-24 bg-charcoal text-white print:hidden">
       <div className="mx-auto max-w-6xl px-5 pt-20 pb-10">
@@ -21,7 +21,7 @@ export function Footer() {
           </div>
 
           <div className="space-y-3 text-sm">
-            <p className="text-xs font-semibold tracking-[0.16em] text-white/50 uppercase">Sunday service</p>
+            <p className="text-xs font-semibold tracking-[0.16em] text-white/50 uppercase">{site.service.day} service</p>
             <p className="font-display text-2xl tabular-nums">{site.service.time}</p>
             <p className="leading-relaxed text-white/70">
               {site.service.venue}
@@ -33,7 +33,7 @@ export function Footer() {
                 Get directions
               </a>
               <a
-                href={whatsappLink("Hello LIT Church, I would like to know more.")}
+                href={whatsappLink(site, "Hello LIT Church, I would like to know more.")}
                 className="inline-flex items-center gap-2 text-flame-gold hover:underline"
               >
                 <WhatsApp className="size-4" /> Chat on WhatsApp

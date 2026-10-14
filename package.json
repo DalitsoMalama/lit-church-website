@@ -7,7 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "tsx --test tests/*.test.ts"
+    "test": "tsx --test tests/*.test.ts",
+    "db:start": "docker compose -f supabase/local/docker-compose.yml up -d --wait && node scripts/local-env.mjs",
+    "db:stop": "docker compose -f supabase/local/docker-compose.yml stop",
+    "db:reset": "docker compose -f supabase/local/docker-compose.yml down -v && npm run db:start"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

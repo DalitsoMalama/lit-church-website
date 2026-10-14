@@ -1,6 +1,6 @@
 import { connection } from "next/server";
 import { nextService } from "@/lib/service";
-import { site } from "@/lib/site";
+import { getSite } from "@/lib/content";
 
 // "Add to calendar": an .ics invite for the next Sunday service (works with Google, Apple and Outlook calendars).
 const ics = (d: Date) => d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
@@ -8,7 +8,8 @@ const esc = (s: string) => s.replace(/([,;\\])/g, "\\$1");
 
 export async function GET() {
   await connection(); // depends on the current date
-  const { start, end } = nextService();
+  const site = await getSite();
+  const { start, end } = nextService(new Date(), site.service);
   const body = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
